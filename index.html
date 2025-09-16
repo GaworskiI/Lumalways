@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumalways</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hand-scale-base: min(90vw, 90vh);
+            --face-color: #2c2c2c;
+            --text-color: #e0e0e0;
+            --hand-color: #f0f0f0;
+            --second-hand-color: #e8a87c;
+        }
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+        .clock {
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--face-color);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .clock .number {
+            position: absolute;
+            font-size: calc(var(--hand-scale-base) * 0.15);
+            color: var(--text-color);
+            font-weight: 700;
+            user-select: none;
+        }
+        .number.twelve {
+            top: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .number.three {
+            top: 50%;
+            right: 5%;
+            transform: translateY(-50%);
+        }
+        .number.six {
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .number.nine {
+            top: 50%;
+            left: 5%;
+            transform: translateY(-50%);
+        }
+        .hand {
+            --rotation: 0;
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            background-color: var(--hand-color);
+            transform-origin: bottom;
+            transform: translateX(-50%) rotate(calc(var(--rotation) * 1deg));
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            z-index: 10;
+        }
+        .clock::after {
+            content: '';
+            position: absolute;
+            width: calc(var(--hand-scale-base) * 0.03);
+            height: calc(var(--hand-scale-base) * 0.03);
+            background-color: var(--second-hand-color);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 12;
+            border: calc(var(--hand-scale-base) * 0.005) solid var(--hand-color);
+        }
+        .hour-hand {
+            width: calc(var(--hand-scale-base) * 0.02);
+            height: calc(var(--hand-scale-base) * 0.25);
+        }
+        .minute-hand {
+            width: calc(var(--hand-scale-base) * 0.015);
+            height: calc(var(--hand-scale-base) * 0.320);
+        }
+        .second-hand {
+            width: calc(var(--hand-scale-base) * 0.010);
+            height: calc(var(--hand-scale-base) * 0.335);
+            background-color: var(--second-hand-color);
+            z-index: 11;
+        }
+        .fullscreen-toggle {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            cursor: pointer;
+            z-index: 999;
+            user-select: none;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        .fullscreen-toggle:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="clock">
+        <div class="hand hour-hand"></div>
+        <div class="hand minute-hand"></div>
+        <div class="hand second-hand"></div>
+        <div class="number twelve"><span>12</span></div>
+        <div class="number three"><span>3</span></div>
+        <div class="number six"><span>6</span></div>
+        <div class="number nine"><span>9</span></div>
+    </div>
+    
+    <div class="fullscreen-toggle">⛶</div>
+
+    <script>
+        const hourHand = document.querySelector('.hour-hand');
+        const minuteHand = document.querySelector('.minute-hand');
+        const secondHand = document.querySelector('.second-hand');
+        const fullscreenBtn = document.querySelector('.fullscreen-toggle');
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+        
+        fullscreenBtn.addEventListener('click', toggleFullScreen);
+
+        function setClock() {
+            const now = new Date();
+            const secondsRatio = (now.getSeconds() + now.getMilliseconds() / 1000) / 60;
+            const minutesRatio = (secondsRatio + now.getMinutes()) / 60;
+            const hoursRatio = (minutesRatio + now.getHours()) / 12;
+
+            setRotation(secondHand, secondsRatio);
+            setRotation(minuteHand, minutesRatio);
+            setRotation(hourHand, hoursRatio);
+        }
+
+        function setRotation(element, rotationRatio) {
+            element.style.setProperty('--rotation', rotationRatio * 360);
+        }
+
+        function animateClock() {
+            setClock();
+            window.requestAnimationFrame(animateClock);
+        }
+        
+        animateClock();
+    </script>
+
+</body>
+</html>
