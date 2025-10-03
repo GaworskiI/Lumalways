@@ -4,175 +4,398 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lumalways</title>
-    <link rel="shortcut icon" href="x.png" type="image/png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --hand-scale-base: min(90vw, 90vh);
-            --face-color: #2c2c2c;
-            --text-color: #e0e0e0;
-            --hand-color: #f0f0f0;
-            --second-hand-color: #e8a87c;
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-image 0.5s ease-in-out, background-color 0.5s ease-in-out;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
         }
-        *, *::before, *::after {
-            box-sizing: border-box;
+        .text-shadow {
+            text-shadow: 0px 0px 8px rgba(0, 0, 0, 0.7), 0px 0px 15px rgba(0,0,0,0.5);
+        }
+        html, body {
+            overflow: hidden;
+            height: 100%;
             margin: 0;
             padding: 0;
         }
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+        .control-btn {
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
-        body {
-            font-family: 'Nunito', sans-serif;
+        .control-btn:hover {
+            background-color: rgba(255, 255, 255, 0.8) !important;
+            transform: scale(1.1);
         }
-        .clock {
-            width: 100vw;
-            height: 100vh;
-            background-color: var(--face-color);
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        #message-box {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
         }
-        .clock .number {
-            position: absolute;
-            font-size: calc(var(--hand-scale-base) * 0.15);
-            color: var(--text-color);
-            font-weight: 700;
-            user-select: none;
+        #message-box.hidden {
+            opacity: 0;
+            transform: scale(0.95) translate(-50%, -50%);
+            pointer-events: none;
         }
-        .number.twelve {
-            top: 5%;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .number.three {
-            top: 50%;
-            right: 5%;
-            transform: translateY(-50%);
-        }
-        .number.six {
-            bottom: 5%;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .number.nine {
-            top: 50%;
-            left: 5%;
-            transform: translateY(-50%);
-        }
-        .hand {
-            --rotation: 0;
-            position: absolute;
-            bottom: 50%;
-            left: 50%;
-            background-color: var(--hand-color);
-            transform-origin: bottom;
-            transform: translateX(-50%) rotate(calc(var(--rotation) * 1deg));
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            z-index: 10;
-        }
-        .clock::after {
-            content: '';
-            position: absolute;
-            width: calc(var(--hand-scale-base) * 0.03);
-            height: calc(var(--hand-scale-base) * 0.03);
-            background-color: var(--second-hand-color);
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 12;
-            border: calc(var(--hand-scale-base) * 0.005) solid var(--hand-color);
-        }
-        .hour-hand {
-            width: calc(var(--hand-scale-base) * 0.02);
-            height: calc(var(--hand-scale-base) * 0.25);
-        }
-        .minute-hand {
-            width: calc(var(--hand-scale-base) * 0.015);
-            height: calc(var(--hand-scale-base) * 0.320);
-        }
-        .second-hand {
-            width: calc(var(--hand-scale-base) * 0.010);
-            height: calc(var(--hand-scale-base) * 0.335);
-            background-color: var(--second-hand-color);
-            z-index: 11;
-        }
-        .fullscreen-toggle {
-            position: fixed;
-            bottom: 15px;
-            right: 15px;
-            font-size: 1.5rem;
-            color: var(--text-color);
-            cursor: pointer;
-            z-index: 999;
-            user-select: none;
-            opacity: 0.5;
-            transition: opacity 0.2s;
-        }
-        .fullscreen-toggle:hover {
+        #message-box.visible {
             opacity: 1;
+            transform: scale(1) translate(-50%, -50%);
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #4a5568;
+            transition: .4s;
+            border-radius: 28px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #3b82f6;
+        }
+        input:focus + .slider {
+            box-shadow: 0 0 1px #3b82f6;
+        }
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+        .fullscreen-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            width: 100%;
+            padding: 0 1rem;
+            box-sizing: border-box;
+        }
+        #toggle-controls-btn {
+            background-color: rgba(100, 100, 100, 0.7);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-size: 16px;
+            flex-grow: 0;
+            text-align: center;
+            margin-right: 0;
+        }
+        #toggle-controls-btn:hover {
+            background-color: rgba(80, 80, 80, 0.9);
+            transform: scale(1.05);
+        }
+        .hidden-controls {
+            display: none !important;
+        }
+        #controls {
+            position: absolute;
+            bottom: 60px;
+            right: 5px;
+            left: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            space-y-3;
+            z-index: 10;
+            padding: 0 1rem;
+            box-sizing: border-box;
+            width: auto;
+        }
+        #controls > div {
+            width: auto;
+            min-width: 150px;
+            justify-content: flex-end;
+        }
+        @media (max-width: 768px) {
+            .text-6xl {
+                font-size: 5rem;
+            }
+            .text-xl {
+                font-size: 2rem;
+            }
+            #controls {
+                bottom: 70px;
+                right: 10px;
+                left: 10px;
+                align-items: center;
+                width: auto;
+            }
+            #controls > div {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .control-btn {
+                padding: 12px;
+                width: 100%;
+            }
+            .fullscreen-controls {
+                flex-direction: column;
+                align-items: center;
+                bottom: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            #toggle-controls-btn {
+                margin-right: 0;
+                margin-bottom: 10px;
+                width: 90%;
+                max-width: 300px;
+            }
+            .hidden-controls {
+                display: none !important;
+            }
+@media screen and (orientation: portrait) {
+    body::before {
+        content: "Obróć urządzenie, aby korzystać z Lumalways.";
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        background-color: rgba(0, 0, 0, 0.85);
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        z-index: 9999;
+        text-align: center;
+        font-size: 1.2rem;
+    }
+
+    #clock,
+    #date,
+    #controls,
+    .fullscreen-controls,
+    #message-box {
+        display: none !important;
+    }
         }
     </style>
 </head>
-<body>
+<body class="bg-black text-white flex flex-col items-center justify-center min-h-screen p-4 relative">
 
-    <div class="clock">
-        <div class="hand hour-hand"></div>
-        <div class="hand minute-hand"></div>
-        <div class="hand second-hand"></div>
-        <div class="number twelve"><span>12</span></div>
-        <div class="number three"><span>3</span></div>
-        <div class="number six"><span>6</span></div>
-        <div class="number nine"><span>9</span></div>
+    <div class="text-center">
+        <div id="clock" class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold text-shadow">--:--</div>
+        <div id="date" class="text-xl sm:text-2xl md:text-3xl lg:text-4xl mt-2 sm:mt-3 md:mt-4 text-shadow">Ładowanie daty...</div>
     </div>
-    
-    <div class="fullscreen-toggle">⛶</div>
+
+    <div id="controls" class="absolute bottom-5 right-5 sm:bottom-8 sm:right-8 flex flex-col items-end space-y-3">
+        <div class="flex items-center space-x-2 bg-gray-700/80 p-2 rounded-lg">
+            <span class="text-sm text-gray-300">Sekundy:</span>
+            <label for="seconds-toggle" class="toggle-switch">
+                <input type="checkbox" id="seconds-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <button id="reset-wallpaper-btn" title="Resetuj tapetę" class="control-btn bg-red-600 hover:bg-red-700 text-white p-3 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 12H4M4 12l6-6m-6 6l6 6"/> <path d="M21 12A9 9 0 1 1 12 3a9 9 0 0 1 9 9z"></path> </svg>
+        </button>
+
+        <input type="file" id="wallpaper-input" accept="image/*" class="hidden">
+        <button id="change-wallpaper-btn" title="Zmień tapetę" class="control-btn bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+        </button>
+    </div>
+
+    <div class="fullscreen-controls">
+        <button id="toggle-controls-btn">Ukryj przyciski do kontroli.</button>
+    </div>
+
+    <div id="message-box" class="hidden fixed top-1/2 left-1/2 bg-gray-800 text-white p-6 rounded-lg shadow-xl z-50 text-center w-11/12 max-w-sm">
+        <p id="message-text" class="mb-4"></p>
+        <button id="close-message-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-400">OK</button>
+    </div>
 
     <script>
-        const hourHand = document.querySelector('.hour-hand');
-        const minuteHand = document.querySelector('.minute-hand');
-        const secondHand = document.querySelector('.second-hand');
-        const fullscreenBtn = document.querySelector('.fullscreen-toggle');
+        const clockElement = document.getElementById('clock');
+        const dateElement = document.getElementById('date');
+        const wallpaperInput = document.getElementById('wallpaper-input');
+        const changeWallpaperBtn = document.getElementById('change-wallpaper-btn');
+        const resetWallpaperBtn = document.getElementById('reset-wallpaper-btn');
+        const secondsToggle = document.getElementById('seconds-toggle');
+        const bodyElement = document.body;
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        const closeMessageBtn = document.getElementById('close-message-btn');
+        const controlsElement = document.getElementById('controls');
+        const toggleControlsBtn = document.getElementById('toggle-controls-btn');
 
-        function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-            } else if (document.exitFullscreen) {
-                document.exitFullscreen();
+        const daysOfWeek = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
+        const months = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
+
+        let showSeconds = false;
+        let areControlsHidden = false;
+
+        function updateTimeDate() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            let timeString = `${hours}:${minutes}`;
+            if (showSeconds) {
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                timeString += `:${seconds}`;
+            }
+            clockElement.textContent = timeString;
+            const dayName = daysOfWeek[now.getDay()];
+            const dayOfMonth = now.getDate();
+            const monthName = months[now.getMonth()];
+            const year = now.getFullYear();
+            dateElement.textContent = `${dayName}, ${dayOfMonth} ${monthName} ${year}`;
+        }
+
+        function showMessage(message) {
+            messageText.textContent = message;
+            messageBox.classList.remove('hidden');
+            messageBox.classList.add('visible');
+        }
+
+        function hideMessage() {
+            messageBox.classList.add('hidden');
+            messageBox.classList.remove('visible');
+        }
+
+        closeMessageBtn.addEventListener('click', hideMessage);
+
+        changeWallpaperBtn.addEventListener('click', () => {
+            wallpaperInput.click();
+        });
+
+        wallpaperInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageUrl = e.target.result;
+                    bodyElement.style.backgroundImage = `url(${imageUrl})`;
+                    bodyElement.classList.remove('bg-black');
+                    try {
+                        localStorage.setItem('aodWallpaper', imageUrl);
+                    } catch (error) {
+                        console.error('Błąd zapisu do localStorage:', error);
+                        showMessage('Nie udało się zapisać tapety. Pamięć lokalna może być pełna.');
+                    }
+                };
+                reader.onerror = () => {
+                    console.error('Błąd odczytu pliku.');
+                    showMessage('Wystąpił błąd podczas wczytywania obrazu.');
+                };
+                reader.readAsDataURL(file);
+            } else if (file) {
+                showMessage('Wybrany plik nie jest obsługiwanym formatem obrazu.');
+            }
+            wallpaperInput.value = null;
+        });
+
+        resetWallpaperBtn.addEventListener('click', () => {
+            bodyElement.style.backgroundImage = '';
+            bodyElement.classList.add('bg-black');
+            try {
+                localStorage.removeItem('aodWallpaper');
+            } catch (error) {
+                console.error('Błąd usuwania z localStorage:', error);
+            }
+            showMessage('Tapeta została zresetowana do domyślnej.');
+        });
+
+        secondsToggle.addEventListener('change', (event) => {
+            showSeconds = event.target.checked;
+            updateTimeDate();
+            try {
+                localStorage.setItem('aodShowSeconds', showSeconds.toString());
+            } catch (error) {
+                console.error('Błąd zapisu preferencji sekundnika do localStorage:', error);
+            }
+        });
+
+        function loadSavedWallpaper() {
+            try {
+                const savedWallpaper = localStorage.getItem('aodWallpaper');
+                if (savedWallpaper) {
+                    bodyElement.style.backgroundImage = `url(${savedWallpaper})`;
+                    bodyElement.classList.remove('bg-black');
+                } else {
+                    bodyElement.classList.add('bg-black');
+                }
+            } catch (error) {
+                console.error('Błąd odczytu tapety z localStorage:', error);
+                bodyElement.classList.add('bg-black');
             }
         }
-        
-        fullscreenBtn.addEventListener('click', toggleFullScreen);
 
-        function setClock() {
-            const now = new Date();
-            const secondsRatio = (now.getSeconds() + now.getMilliseconds() / 1000) / 60;
-            const minutesRatio = (secondsRatio + now.getMinutes()) / 60;
-            const hoursRatio = (minutesRatio + now.getHours()) / 12;
-
-            setRotation(secondHand, secondsRatio);
-            setRotation(minuteHand, minutesRatio);
-            setRotation(hourHand, hoursRatio);
+        function loadSecondsPreference() {
+            try {
+                const savedPreference = localStorage.getItem('aodShowSeconds');
+                if (savedPreference !== null) {
+                    showSeconds = savedPreference === 'true';
+                    secondsToggle.checked = showSeconds;
+                }
+            } catch (error) {
+                console.error('Błąd odczytu preferencji sekundnika z localStorage:', error);
+            }
         }
 
-        function setRotation(element, rotationRatio) {
-            element.style.setProperty('--rotation', rotationRatio * 360);
-        }
+        toggleControlsBtn.addEventListener('click', () => {
+            areControlsHidden = !areControlsHidden;
+            if (areControlsHidden) {
+                controlsElement.classList.add('hidden-controls');
+                toggleControlsBtn.textContent = 'Pokaż przyciski do kontroli.';
+            } else {
+                controlsElement.classList.remove('hidden-controls');
+                toggleControlsBtn.textContent = 'Ukryj przyciski do kontroli.';
+            }
+        });
 
-        function animateClock() {
-            setClock();
-            window.requestAnimationFrame(animateClock);
-        }
-        
-        animateClock();
+        loadSavedWallpaper();
+        loadSecondsPreference();
+        updateTimeDate();
+        setInterval(updateTimeDate, 1000);
+
+        bodyElement.style.backgroundSize = 'cover';
+        bodyElement.style.backgroundPosition = 'center';
+        bodyElement.style.backgroundRepeat = 'no-repeat';
+        bodyElement.style.minHeight = '100vh';
     </script>
-
 </body>
 </html>
